@@ -1,0 +1,40 @@
+@page
+@model IndexModel
+@{
+    ViewData["Title"] = "TechCorp Employee Portal";
+}
+
+<div class="text-center">
+    <h1 class="display-4">Welcome to TechCorp Employee Portal</h1>
+    <p>Access your employee resources and company information.</p>
+    
+    <div class="row mt-4">
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">Employee Directory</h5>
+                    <p class="card-text">Find contact information for your colleagues.</p>
+                    <a href="/Employees" class="btn btn-primary">View Directory</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">Company Resources</h5>
+                    <p class="card-text">Access company documents and policies.</p>
+                    <a href="/Resources" class="btn btn-primary">View Resources</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">Department Info</h5>
+                    <p class="card-text">View information about company departments.</p>
+                    <a href="/Departments" class="btn btn-primary">View Departments</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
