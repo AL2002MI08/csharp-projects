@@ -1,6 +1,114 @@
-@GameCatalogApi_HostAddress = http://localhost:5046
+@baseUrl = http://localhost:5046
 
-GET {{GameCatalogApi_HostAddress}}/weatherforecast/
+### STEP 1: Login as Gamer (copy token from response)
+POST {{baseUrl}}/api/auth/login
+Content-Type: application/json
+
+{
+  "email": "gamer@gmail.com",
+  "password": "Gamer123!"
+}
+
+### STEP 2: Login as Developer (copy token from response)
+POST {{baseUrl}}/api/auth/login
+Content-Type: application/json
+
+{
+  "email": "dev@gmail.com",
+  "password": "Developer123!"
+}
+
+### STEP 3: Login as Admin (copy token from response)
+POST {{baseUrl}}/api/auth/login
+Content-Type: application/json
+
+{
+  "email": "admin@gmail.com",
+  "password": "Admin123!"
+}
+
+### ---- Paste your token below after Authorization: Bearer ----
+@token = PASTE_YOUR_TOKEN_HERE
+
+### GET all games (Gamer / Developer / Admin)
+GET {{baseUrl}}/api/Games
+Authorization: Bearer {{token}}
 Accept: application/json
 
-###
+### GET game by ID
+GET {{baseUrl}}/api/Games/1
+Authorization: Bearer {{token}}
+Accept: application/json
+
+### SEARCH games by genre
+GET {{baseUrl}}/api/Games/search?genre=RPG
+Authorization: Bearer {{token}}
+Accept: application/json
+
+### CREATE a new game (Developer / Admin only)
+POST {{baseUrl}}/api/Games
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "id": 0,
+  "title": "Shadow Realms 2",
+  "developer": "Mystic Studios",
+  "genre": "RPG",
+  "price": 49.99,
+  "releaseYear": 2025,
+  "isMultiplayer": true
+}
+
+### UPDATE a game (Developer / Admin only)
+PUT {{baseUrl}}/api/Games/1
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "id": 1,
+  "title": "Realm of Shadows Remastered",
+  "developer": "Mystic Studios",
+  "genre": "RPG",
+  "price": 44.99,
+  "releaseYear": 2024,
+  "isMultiplayer": false
+}
+
+### DELETE a game (Developer / Admin only)
+DELETE {{baseUrl}}/api/Games/5
+Authorization: Bearer {{token}}
+
+### ==========================================
+### REVIEW ENDPOINTS (in ReviewsController)
+### ==========================================
+
+### GET all reviews for a game (by Game ID)
+GET {{baseUrl}}/api/reviews/game/1
+Authorization: Bearer {{token}}
+Accept: application/json
+
+### GET a single review by Review ID
+GET {{baseUrl}}/api/reviews/1
+Authorization: Bearer {{token}}
+Accept: application/json
+
+### CREATE a new review for a game
+POST {{baseUrl}}/api/reviews
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "id": 0,
+  "gameId": 1,
+  "reviewerName": "GamerX42",
+  "comment": "Outstanding story and visuals!",
+  "rating": 9
+}
+
+### DELETE a review by Review ID
+DELETE {{baseUrl}}/api/reviews/1
+Authorization: Bearer {{token}}
+
+
+
