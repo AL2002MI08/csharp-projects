@@ -1,142 +1,89 @@
+using GameCatalogApi.Data;
 using GameCatalogApi.Models;
+using Microsoft.EntityFrameworkCore;
+using System;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace GameCatalogApi.Services
 {
     public class GameService
     {
-        private static List<Game> _games = new List<Game>
+        private readonly AppDbContext _context;
+
+        public GameService(AppDbContext context)
         {
-            new Game { 
-                Id = 1, 
-                Title = "Realm of Shadows", 
-                Developer = "Mystic Studios", 
-                Genre = "RPG", 
-                Price = 39.99M, 
-                ReleaseYear = 2018, 
-                IsMultiplayer = false 
-            },
-            new Game { 
-                Id = 2, 
-                Title = "Victory League", 
-                Developer = "SportSimulation Inc", 
-                Genre = "Sports", 
-                Price = 59.99M, 
-                ReleaseYear = 2022, 
-                IsMultiplayer = true 
-            },
-            new Game { 
-                Id = 3, 
-                Title = "Block Builders", 
-                Developer = "Cube Games", 
-                Genre = "Sandbox", 
-                Price = 29.99M, 
-                ReleaseYear = 2017, 
-                IsMultiplayer = true 
-            },
-            new Game { 
-                Id = 4, 
-                Title = "Neo City 2050", 
-                Developer = "Future Works", 
-                Genre = "RPG", 
-                Price = 49.99M, 
-                ReleaseYear = 2021, 
-                IsMultiplayer = false 
-            },
-            new Game { 
-                Id = 5, 
-                Title = "Urban Chaos", 
-                Developer = "Open World Studios", 
-                Genre = "Action", 
-                Price = 29.99M, 
-                ReleaseYear = 2019, 
-                IsMultiplayer = true 
-            }
-        };
+            _context = context;
+            _context.Database.EnsureCreated();
+            SeedDataIfEmpty();
+        }
 
-        private static List<Review> _reviews = new List<Review>
+        private void SeedDataIfEmpty()
         {
-            new Review { 
-                Id = 1, 
-                GameId = 1, 
-                ReviewerName = "GamerX42", 
-                Comment = "Incredible story and atmospheric world design. The magic system is innovative!", 
-                Rating = 9,
-                ReviewDate = DateTime.Parse("2019-05-20") 
-            },
-            new Review { 
-                Id = 2, 
-                GameId = 2, 
-                ReviewerName = "SportsGamer99", 
-                Comment = "Best sports simulation I've played this year. Physics engine is spot on!", 
-                Rating = 8,
-                ReviewDate = DateTime.Parse("2022-10-15") 
-            },
-            new Review { 
-                Id = 3, 
-                GameId = 3, 
-                ReviewerName = "BuilderPro", 
-                Comment = "Endless creativity in this game. The building mechanics are so intuitive.", 
-                Rating = 10,
-                ReviewDate = DateTime.Parse("2020-01-10") 
-            },
-            new Review { 
-                Id = 4, 
-                GameId = 4, 
-                ReviewerName = "CyberPlayer", 
-                Comment = "The futuristic setting is breathtaking but combat needs some work.", 
-                Rating = 7,
-                ReviewDate = DateTime.Parse("2021-12-05") 
-            },
-            new Review { 
-                Id = 5, 
-                GameId = 5, 
-                ReviewerName = "ActionSeeker", 
-                Comment = "Massive open world with tons of activities. Never gets boring!", 
-                Rating = 9,
-                ReviewDate = DateTime.Parse("2020-03-18") 
-            }
-        };
+            if (_context.Games.Any())
+                return;
 
-        private static int _nextGameId = 6;
-        private static int _nextReviewId = 6;
+            var games = new List<Game>
+            {
+                new Game { Title = "Realm of Shadows", Developer = "Mystic Studios", Genre = "RPG", Price = 39.99M, ReleaseYear = 2018, IsMultiplayer = false },
+                new Game { Title = "Victory League", Developer = "SportSimulation Inc", Genre = "Sports", Price = 59.99M, ReleaseYear = 2022, IsMultiplayer = true },
+                new Game { Title = "Block Builders", Developer = "Cube Games", Genre = "Sandbox", Price = 29.99M, ReleaseYear = 2017, IsMultiplayer = true },
+                new Game { Title = "Neo City 2050", Developer = "Future Works", Genre = "RPG", Price = 49.99M, ReleaseYear = 2021, IsMultiplayer = false },
+                new Game { Title = "The Blood of Dawnwalker ", Developer = "Rebel Wolves Studio", Genre = "Dark Fantasy", Price = 70.00M, ReleaseYear = 2026, IsMultiplayer = true }
+            };
 
-        // Game methods
-        public List<Game> GetAllGames() => _games;
+            _context.Games.AddRange(games);
+            _context.SaveChanges();
 
-        public Game? GetGame(int id) => _games.FirstOrDefault(g => g.Id == id);
+            var reviews = new List<Review>
+            {
+                new Review { GameId = games[0].Id, ReviewerName = "GamerX42", Comment = "Incredible story and atmospheric world design. The magic system is innovative!", Rating = 9, ReviewDate = DateTime.Parse("2019-05-20") },
+                new Review { GameId = games[1].Id, ReviewerName = "SportsGamer99", Comment = "Best sports simulation I've played this year. Physics engine is spot on!", Rating = 8, ReviewDate = DateTime.Parse("2022-10-15") },
+                new Review { GameId = games[2].Id, ReviewerName = "BuilderPro", Comment = "Endless creativity in this game. The building mechanics are so intuitive.", Rating = 10, ReviewDate = DateTime.Parse("2020-01-10") },
+                new Review { GameId = games[3].Id, ReviewerName = "CyberPlayer", Comment = "The futuristic setting is breathtaking but combat needs some work.", Rating = 7, ReviewDate = DateTime.Parse("2021-12-05") },
+                new Review { GameId = games[4].Id, ReviewerName = "ActionSeeker", Comment = "Massive open world with tons of activities. Never gets boring!", Rating = 9, ReviewDate = DateTime.Parse("2026-09-05") }
+            };
+
+            _context.Reviews.AddRange(reviews);
+            _context.SaveChanges();
+        }
+
+        public List<Game> GetAllGames() => _context.Games.ToList();
+
+        public Game? GetGame(int id) => _context.Games.FirstOrDefault(g => g.Id == id);
 
         public List<Game> SearchGames(string? title, string? genre, int? releaseYear)
         {
-            var result = _games.AsQueryable();
+            var query = _context.Games.AsQueryable();
 
-            if (!string.IsNullOrEmpty(title))
+            if (!string.IsNullOrWhiteSpace(title))
             {
-                result = result.Where(g => g.Title.Contains(title, StringComparison.OrdinalIgnoreCase));
+                query = query.Where(g => g.Title.ToLower().Contains(title.ToLower()));
             }
 
-            if (!string.IsNullOrEmpty(genre))
+            if (!string.IsNullOrWhiteSpace(genre))
             {
-                result = result.Where(g => g.Genre.Equals(genre, StringComparison.OrdinalIgnoreCase));
+                query = query.Where(g => g.Genre.ToLower() == genre.ToLower());
             }
 
             if (releaseYear.HasValue)
             {
-                result = result.Where(g => g.ReleaseYear == releaseYear.Value);
+                query = query.Where(g => g.ReleaseYear == releaseYear.Value);
             }
 
-            return result.ToList();
+            return query.ToList();
         }
 
         public Game CreateGame(Game game)
         {
-            game.Id = _nextGameId++;
-            _games.Add(game);
+            _context.Games.Add(game);
+            _context.SaveChanges();
             return game;
         }
 
         public bool UpdateGame(int id, Game game)
         {
-            var existingGame = GetGame(id);
+            var existingGame = _context.Games.FirstOrDefault(g => g.Id == id);
             if (existingGame == null)
                 return false;
 
@@ -147,45 +94,49 @@ namespace GameCatalogApi.Services
             existingGame.ReleaseYear = game.ReleaseYear;
             existingGame.IsMultiplayer = game.IsMultiplayer;
 
+            _context.SaveChanges();
             return true;
         }
 
         public bool DeleteGame(int id)
         {
-            var game = GetGame(id);
+            var game = _context.Games.FirstOrDefault(g => g.Id == id);
             if (game == null)
                 return false;
 
-            _games.Remove(game);
+            var reviews = _context.Reviews.Where(r => r.GameId == id).ToList();
+            if (reviews.Any())
+            {
+                _context.Reviews.RemoveRange(reviews);
+            }
 
-            // Also remove all reviews for this game
-            _reviews.RemoveAll(r => r.GameId == id);
-
+            _context.Games.Remove(game);
+            _context.SaveChanges();
             return true;
         }
 
-        // Review methods
         public List<Review> GetReviewsByGameId(int gameId) => 
-            _reviews.Where(r => r.GameId == gameId).ToList();
+            _context.Reviews.Where(r => r.GameId == gameId).ToList();
 
         public Review? GetReview(int id) => 
-            _reviews.FirstOrDefault(r => r.Id == id);
+            _context.Reviews.FirstOrDefault(r => r.Id == id);
 
         public Review CreateReview(Review review)
         {
-            review.Id = _nextReviewId++;
             review.ReviewDate = DateTime.Now;
-            _reviews.Add(review);
+            _context.Reviews.Add(review);
+            _context.SaveChanges();
             return review;
         }
 
         public bool DeleteReview(int id)
         {
-            var review = GetReview(id);
+            var review = _context.Reviews.FirstOrDefault(r => r.Id == id);
             if (review == null)
                 return false;
 
-            _reviews.Remove(review);
+            _context.Reviews.Remove(review);
+            _context.SaveChanges();
             return true;
         }
     }
