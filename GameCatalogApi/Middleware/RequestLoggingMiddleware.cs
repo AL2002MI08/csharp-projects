@@ -6,7 +6,7 @@ public class RequestLoggingMiddleware
     public async Task InvokeAsync(HttpContext context)
     {
         Console.WriteLine($"→ {context.Request.Method} {context.Request.Path}");
-        await _next(context);  // pass to next middleware
+        await _next(context);
         Console.WriteLine($"← {context.Response.StatusCode}");
     }
 }
