@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Authorization;
 using GameCatalogApi.Models;
 using GameCatalogApi.Services;
 using System.Collections.Generic;
@@ -6,7 +7,8 @@ using System.Collections.Generic;
 namespace GameCatalogApi.Controllers
 {
     [ApiController]
-    [Route("api/Games")]
+    [Route("api/games")]
+    [Authorize]
     public class GamesController : ControllerBase
     {
         private readonly GameService _gameService;
@@ -17,11 +19,13 @@ namespace GameCatalogApi.Controllers
         }
 
         [HttpGet]
+        [Authorize(Roles = "Gamer,Developer,Admin")]
         public ActionResult<List<Game>> GetAll(){
           return _gameService.GetAllGames();
         }
 
         [HttpGet("{id}")]
+        [Authorize(Roles = "Gamer,Developer,Admin")]
         public ActionResult<Game> GetById(int id)
         {
             var game = _gameService.GetGame(id);
@@ -33,6 +37,7 @@ namespace GameCatalogApi.Controllers
         }
 
         [HttpGet("search")]
+        [Authorize(Roles = "Gamer,Developer,Admin")]
         public ActionResult<List<Game>> Search(
             [FromQuery] string? title, 
             [FromQuery] string? genre, 
@@ -48,6 +53,7 @@ namespace GameCatalogApi.Controllers
         }
 
         [HttpPost]
+        [Authorize(Roles = "Developer,Admin")]
         public ActionResult<Game> Create(Game game)
         {
             var newGame = _gameService.CreateGame(game);
@@ -57,6 +63,7 @@ namespace GameCatalogApi.Controllers
 
 
         [HttpPut("{id}")]
+        [Authorize(Roles = "Developer,Admin")]
         public IActionResult Update(int id, Game game)
         {
             if (id != game.Id)
@@ -71,6 +78,7 @@ namespace GameCatalogApi.Controllers
         }
 
         [HttpDelete("{id}")]
+        [Authorize(Roles = "Developer,Admin")]
         public IActionResult Delete(int id)
         {
             var deleted = _gameService.DeleteGame(id);
@@ -80,6 +88,5 @@ namespace GameCatalogApi.Controllers
                 
             return NoContent();
         }
-
     }
 }
