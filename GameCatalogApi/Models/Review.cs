@@ -3,9 +3,11 @@ using System.ComponentModel.DataAnnotations;
 namespace GameCatalogApi.Models
 {
     public class Review
-    {
+    {   
+        [Required]
         public int Id { get; set; }
         
+        [Required]
         public int GameId { get; set; }
         
         [Required]

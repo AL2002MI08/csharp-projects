@@ -16,7 +16,6 @@ namespace GameCatalogApi.Controllers
             _gameService = gameService;
         }
 
-        // GET: api/Games
         [HttpGet]
         public ActionResult<List<Game>> GetAll(){
           return _gameService.GetAllGames();
@@ -33,7 +32,6 @@ namespace GameCatalogApi.Controllers
             return game;
         }
 
-        // GET: api/Games/search?title=skyrim&genre=rpg&releaseYear=2011
         [HttpGet("search")]
         public ActionResult<List<Game>> Search(
             [FromQuery] string? title, 
@@ -44,7 +42,7 @@ namespace GameCatalogApi.Controllers
             var games = _gameService.SearchGames(title, genre, releaseYear);
             
             if (games.Count == 0)
-                return new List<Game>(); // Return empty list instead of 404
+                return new List<Game>();
                 
             return games;
         }
@@ -58,7 +56,6 @@ namespace GameCatalogApi.Controllers
         }
 
 
-        // PUT: api/Games/5
         [HttpPut("{id}")]
         public IActionResult Update(int id, Game game)
         {
@@ -73,7 +70,6 @@ namespace GameCatalogApi.Controllers
             return NoContent();
         }
 
-        // DELETE: api/Games/5
         [HttpDelete("{id}")]
         public IActionResult Delete(int id)
         {
