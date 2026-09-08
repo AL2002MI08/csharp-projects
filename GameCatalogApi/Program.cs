@@ -9,7 +9,6 @@ var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddControllers();
 
-// Registered as Scoped because AppDbContext is Scoped
 builder.Services.AddScoped<GameService>();
 builder.Services.AddScoped<TokenService>();
 
@@ -31,7 +30,7 @@ builder.Services.AddSwaggerGen(options =>
         In = ParameterLocation.Header,
         Description = "Enter bearer token below."
     });
-    // Applies the Bearer lock icon to every [Authorize] endpoint at the operation level
+
     options.OperationFilter<SwaggerAuthOperationFilter>();
 });
 
