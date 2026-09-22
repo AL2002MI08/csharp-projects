@@ -1,3 +1,5 @@
+using System.ComponentModel;
+using System.Runtime.InteropServices;
 using System.Runtime.Versioning;
 using System.Text;
 
@@ -78,10 +80,11 @@ internal static class Program
         Console.WriteLine("Enumerating top-level windows (first 5 visible, titled windows)...");
         _windowsPrinted = 0;
 
-        if (!Native.EnumWindows(EnumWindowsCallback, IntPtr.Zero))
-        {
-            int errorCode = System.Runtime.InteropServices.Marshal.GetLastWin32Error();
-            Console.WriteLine($"EnumWindows reported an error (Win32 error {errorCode}).");
+        bool success = Native.EnumWindows(EnumWindowsCallback, IntPtr.Zero);
+        int errorCode = Marshal.GetLastWin32Error();
+        if(!success && errorCode != 0){
+            string message = new Win32Exception(errorCode).Message;
+            Console.WriteLine($"EnumWindows failed (Win32 error {errorCode}: {message}).");
         }
     }
 
