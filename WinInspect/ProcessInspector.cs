@@ -54,13 +54,22 @@ public static class ProcessInspector
 
         try
         {
-            Native.IsWow64Process(handle, out bool isWow64);
-            bool is64Bit = !isWow64;
+            if (!Native.IsWow64Process(handle, out bool isWow64))
+            {
+                int errorCode = Marshal.GetLastWin32Error();
+                return ProcessInspectionResult.Fail(processId, errorCode, new Win32Exception(errorCode).Message);
+            }
 
-            Native.GetProcessMemoryInfo(
-                handle,
-                out Native.PROCESS_MEMORY_COUNTERS counters,
-                (uint)Marshal.SizeOf<Native.PROCESS_MEMORY_COUNTERS>());
+            if (!Native.GetProcessMemoryInfo(
+                    handle,
+                    out Native.PROCESS_MEMORY_COUNTERS counters,
+                    (uint)Marshal.SizeOf<Native.PROCESS_MEMORY_COUNTERS>()))
+            {
+                int errorCode = Marshal.GetLastWin32Error();
+                return ProcessInspectionResult.Fail(processId, errorCode, new Win32Exception(errorCode).Message);
+            }
+
+            bool is64Bit = !isWow64;
 
             return ProcessInspectionResult.Ok(
                 processId,
