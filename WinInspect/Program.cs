@@ -1,7 +1,4 @@
-using System.ComponentModel;
-using System.Runtime.InteropServices;
 using System.Runtime.Versioning;
-using System.Text;
 
 [assembly: SupportedOSPlatform("windows")]
 
@@ -9,10 +6,6 @@ namespace WinInspect;
 
 internal static class Program
 {
-    private static readonly Native.EnumWindowsProc EnumWindowsCallback = HandleEnumWindow;
-
-    private static int _windowsPrinted;
-
     private static void Main()
     {
         Console.WriteLine("WinInspect - minimal P/Invoke process inspector");
@@ -78,34 +71,18 @@ internal static class Program
     {
         Console.WriteLine();
         Console.WriteLine("Enumerating top-level windows (first 5 visible, titled windows)...");
-        _windowsPrinted = 0;
 
-        bool success = Native.EnumWindows(EnumWindowsCallback, IntPtr.Zero);
-        int errorCode = Marshal.GetLastWin32Error();
-        if(!success && errorCode != 0){
-            string message = new Win32Exception(errorCode).Message;
-            Console.WriteLine($"EnumWindows failed (Win32 error {errorCode}: {message}).");
-        }
-    }
+        WindowEnumerationResult result = WindowEnumerator.GetTopLevelWindows(maxCount: 5);
 
-    private static bool HandleEnumWindow(IntPtr hWnd, IntPtr lParam)
-    {
-        if (!Native.IsWindowVisible(hWnd))
+        if (!result.Success)
         {
-            return true;
+            Console.WriteLine($"EnumWindows failed (Win32 error {result.Win32ErrorCode}: {result.Win32ErrorMessage}).");
+            return;
         }
 
-        var title = new StringBuilder(256);
-        Native.GetWindowTextW(hWnd, title, title.Capacity);
-
-        if (title.Length == 0)
+        foreach (WindowInfo window in result.Windows)
         {
-            return true;
+            Console.WriteLine($"  hWnd=0x{window.Handle:X}  \"{window.Title}\"");
         }
-
-        Console.WriteLine($"  hWnd=0x{hWnd:X}  \"{title}\"");
-        _windowsPrinted++;
-
-        return _windowsPrinted < 5;
     }
 }
