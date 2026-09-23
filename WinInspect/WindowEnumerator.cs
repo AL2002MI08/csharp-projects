@@ -38,6 +38,8 @@ public static class WindowEnumerator
     {
         var windows = new List<WindowInfo>(maxCount);
 
+        bool stoppedEarly = false;
+
         Native.EnumWindowsProc callback = (hWnd, lParam) =>
         {
             if (!Native.IsWindowVisible(hWnd))
@@ -45,17 +47,29 @@ public static class WindowEnumerator
                 return true;
             }
 
-            var title = new StringBuilder(256);
-            int length = Native.GetWindowTextW(hWnd, title, title.Capacity);
-
+            int length = Native.GetWindowTextLengthW(hWnd);
             if (length == 0)
+            {
+                return true;
+            }
+
+            var title = new StringBuilder(length + 1);
+            int copied = Native.GetWindowTextW(hWnd, title, title.Capacity);
+
+            if (copied == 0)
             {
                 return true;
             }
 
             windows.Add(new WindowInfo(hWnd, title.ToString()));
 
-            return windows.Count < maxCount;
+            if (windows.Count >= maxCount)
+            {
+                stoppedEarly = true;
+                return false;
+            }
+
+            return true;
         };
 
         bool success = Native.EnumWindows(callback, IntPtr.Zero);
@@ -63,7 +77,7 @@ public static class WindowEnumerator
 
         GC.KeepAlive(callback);
 
-        if (!success && errorCode != 0)
+        if (!success && !stoppedEarly)
         {
             string message = new Win32Exception(errorCode).Message;
             return WindowEnumerationResult.Fail(errorCode, message);

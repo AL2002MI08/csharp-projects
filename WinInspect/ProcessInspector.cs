@@ -42,9 +42,9 @@ public static class ProcessInspector
 {
     public static ProcessInspectionResult Inspect(uint processId)
     {
-        IntPtr handle = Native.OpenProcess(Native.PROCESS_QUERY_LIMITED_INFORMATION, false, processId);
+        using SafeProcessHandle handle = Native.OpenProcess(Native.PROCESS_QUERY_LIMITED_INFORMATION, false, processId);
 
-        if (handle == IntPtr.Zero)
+        if (handle.IsInvalid)
         {
             int errorCode = Marshal.GetLastWin32Error();
             string errorMessage = new Win32Exception(errorCode).Message;
@@ -52,34 +52,27 @@ public static class ProcessInspector
             return ProcessInspectionResult.Fail(processId, errorCode, errorMessage);
         }
 
-        try
+        if (!Native.IsWow64Process(handle, out bool isWow64))
         {
-            if (!Native.IsWow64Process(handle, out bool isWow64))
-            {
-                int errorCode = Marshal.GetLastWin32Error();
-                return ProcessInspectionResult.Fail(processId, errorCode, new Win32Exception(errorCode).Message);
-            }
-
-            if (!Native.GetProcessMemoryInfo(
-                    handle,
-                    out Native.PROCESS_MEMORY_COUNTERS counters,
-                    (uint)Marshal.SizeOf<Native.PROCESS_MEMORY_COUNTERS>()))
-            {
-                int errorCode = Marshal.GetLastWin32Error();
-                return ProcessInspectionResult.Fail(processId, errorCode, new Win32Exception(errorCode).Message);
-            }
-
-            bool is64Bit = !isWow64;
-
-            return ProcessInspectionResult.Ok(
-                processId,
-                is64Bit,
-                counters.WorkingSetSize,
-                counters.PeakWorkingSetSize);
+            int errorCode = Marshal.GetLastWin32Error();
+            return ProcessInspectionResult.Fail(processId, errorCode, new Win32Exception(errorCode).Message);
         }
-        finally
+
+        if (!Native.GetProcessMemoryInfo(
+                handle,
+                out Native.PROCESS_MEMORY_COUNTERS counters,
+                (uint)Marshal.SizeOf<Native.PROCESS_MEMORY_COUNTERS>()))
         {
-            Native.CloseHandle(handle);
+            int errorCode = Marshal.GetLastWin32Error();
+            return ProcessInspectionResult.Fail(processId, errorCode, new Win32Exception(errorCode).Message);
         }
+
+        bool is64Bit = Environment.Is64BitOperatingSystem && !isWow64;
+
+        return ProcessInspectionResult.Ok(
+            processId,
+            is64Bit,
+            counters.WorkingSetSize,
+            counters.PeakWorkingSetSize);
     }
 }
