@@ -8,7 +8,7 @@ namespace GameEngine.Tests.Models
 {
     [Collection(GameStateCollection.Name)]
     [Trait(TestCategories.TraitName, TestCategories.GameState)]
-    public class GameStateResetShould
+    public class GameStateResetShould : IDisposable
     {
         private readonly GameState _sut;
 
@@ -16,6 +16,11 @@ namespace GameEngine.Tests.Models
         {
             _sut = gameStateFixture.State;
             output.WriteLine($"GameState ID={_sut.Id}");
+        }
+
+        public void Dispose()
+        {
+            _sut.Players.Clear();
         }
 
         [Fact]

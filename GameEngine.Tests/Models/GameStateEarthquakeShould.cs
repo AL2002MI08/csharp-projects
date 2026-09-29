@@ -9,7 +9,7 @@ namespace GameEngine.Tests.Models
 {
     [Collection(GameStateCollection.Name)]
     [Trait(TestCategories.TraitName, TestCategories.GameState)]
-    public class GameStateEarthquakeShould
+    public class GameStateEarthquakeShould : IDisposable
     {
         private readonly GameState _sut;
 
@@ -17,9 +17,11 @@ namespace GameEngine.Tests.Models
         {
             _sut = gameStateFixture.State;
             output.WriteLine($"GameState ID={_sut.Id}");
+        }
 
-            // The GameState is shared across the collection, so start each test with no players
-            _sut.Reset();
+        public void Dispose()
+        {
+            _sut.Players.Clear();
         }
 
         [Fact]
