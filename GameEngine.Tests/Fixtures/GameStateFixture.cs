@@ -1,8 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
+using GameEngine.Models;
 
-namespace GameEngine.Tests
+namespace GameEngine.Tests.Fixtures
 {
     public class GameStateFixture : IDisposable
     {

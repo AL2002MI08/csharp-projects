@@ -14,7 +14,11 @@
 			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
 		</PackageReference>
 	</ItemGroup>
-
+	<ItemGroup>
+		<None Update="TestData\TestData.csv">
+			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+		</None>
+	</ItemGroup>
 	<ItemGroup>
 		<ProjectReference Include="..\GameEngine\GameEngine.csproj" />
 	</ItemGroup>

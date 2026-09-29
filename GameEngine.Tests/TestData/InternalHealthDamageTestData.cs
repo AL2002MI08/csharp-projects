@@ -1,11 +1,8 @@
-﻿using System.Collections.Generic;
-using System.Net.NetworkInformation;
-
-namespace GameEngine.Tests
+namespace GameEngine.Tests.TestData
 {
-    public class InternalHealtDamageTestData
+    public class InternalHealthDamageTestData
     {
-        public static IEnumerable<object[]> TestData  
+        public static IEnumerable<object[]> TestData
         {
             get
             {
@@ -14,7 +11,6 @@ namespace GameEngine.Tests
                 yield return new object[] { 50, 50 };
                 yield return new object[] { 101, 1 };
             }
-           
         }
     }
 }
