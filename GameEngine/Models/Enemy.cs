@@ -1,4 +1,4 @@
-namespace GameEngine
+namespace GameEngine.Models
 {
     public abstract class Enemy
     {

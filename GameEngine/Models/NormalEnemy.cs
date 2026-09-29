@@ -1,4 +1,4 @@
-namespace GameEngine
+namespace GameEngine.Models
 {
     public class NormalEnemy : Enemy
     {

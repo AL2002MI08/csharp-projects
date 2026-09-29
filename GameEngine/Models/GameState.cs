@@ -1,11 +1,12 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
+using System.Threading;
+using GameEngine.Constants;
 
-namespace GameEngine
+namespace GameEngine.Models
 {
     public class GameState
     {
-        public static readonly int EarthquakeDamage = 25;
         public List<PlayerCharacter> Players { get; set; } = new List<PlayerCharacter>();
         public Guid Id { get; } = Guid.NewGuid();
 
@@ -18,7 +19,7 @@ namespace GameEngine
         {
             foreach (var player in Players)
             {
-                player.TakeDamage(EarthquakeDamage);
+                player.TakeDamage(GameConstants.EarthquakeDamage);
             }
         }
 
@@ -27,11 +28,10 @@ namespace GameEngine
             Players.Clear();
         }
 
-        private void CreateGameWorld()
+        private static void CreateGameWorld()
         {
             // Simulate expensive creation
-            System.Threading.Thread.Sleep(2000);
+            Thread.Sleep(2000);
         }
     }
 }
-

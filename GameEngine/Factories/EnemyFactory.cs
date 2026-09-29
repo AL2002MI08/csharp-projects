@@ -1,6 +1,10 @@
 using System;
+using System.Linq;
+using GameEngine.Constants;
+using GameEngine.Exceptions;
+using GameEngine.Models;
 
-namespace GameEngine
+namespace GameEngine.Factories
 {
     public class EnemyFactory
     {
@@ -16,7 +20,8 @@ namespace GameEngine
                 if (!IsValidBossName(name))
                 {
                     throw new EnemyCreationException(
-                        $"{name} is not a valid name for a Boss enemy, Boss enemy names must end with 'King' or 'Queen'",
+                        $"{name} is not a valid name for a Boss enemy, Boss enemy names must end with " +
+                        string.Join(" or ", GameConstants.BossNameSuffixes.Select(suffix => $"'{suffix}'")),
                         name);
                 }
 
@@ -26,7 +31,7 @@ namespace GameEngine
             return new NormalEnemy { Name = name };
         }
 
-        private bool IsValidBossName(string name) => name.EndsWith("King") ||
-                                                     name.EndsWith("Queen");
+        private static bool IsValidBossName(string name) =>
+            GameConstants.BossNameSuffixes.Any(name.EndsWith);
     }
 }
