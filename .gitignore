@@ -1,0 +1,64 @@
+# Build output
+[Bb]in/
+[Oo]bj/
+[Dd]ebug/
+[Rr]elease/
+x64/
+x86/
+[Aa]rm/
+[Aa]rm64/
+[Ll]og/
+[Ll]ogs/
+artifacts/
+publish/
+*.nupkg
+*.snupkg
+
+# Test results & coverage
+[Tt]est[Rr]esult*/
+*.trx
+*.coverage
+*.coveragexml
+coverage*.json
+coverage*.xml
+coverage*.info
+
+# IDEs / editors
+.vs/
+.vscode/*
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json
+.idea/
+*.suo
+*.user
+*.userosscache
+*.sln.docstates
+*.swp
+*~
+
+# Rider / ReSharper
+_ReSharper*/
+*.DotSettings.user
+
+# NuGet
+packages/
+*.nuget.props
+*.nuget.targets
+project.lock.json
+project.fragment.lock.json
+
+# Local databases (e.g. GameCatalogApi SQLite)
+*.db
+*.db-shm
+*.db-wal
+
+# Secrets / local env
+*.env
+.env*
+appsettings.*.local.json
+
+# OS files
+.DS_Store
+Thumbs.db
